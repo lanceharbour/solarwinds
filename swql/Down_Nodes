@@ -1,0 +1,4 @@
+SELECT nd.Caption AS Node, nd.IP_Address, nd.Community, nd.Status, nd.StatusDescription, nd.Vendor
+FROM Orion.Nodes nd
+WHERE nd.Status = '2' OR nd.Status = '0'
+ORDER BY nd.Caption

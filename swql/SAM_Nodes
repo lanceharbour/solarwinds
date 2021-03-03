@@ -1,0 +1,6 @@
+SELECT nd.Caption AS Node, nd.IP_Address, nip.SubnetMask, aa.Name, aa.StatusDescription
+FROM Orion.Nodes nd
+JOIN Orion.NodeIPAddresses nip ON nip.NodeID = nd.NodeID
+JOIN Orion.APM.Application aa on aa.NodeID = nd.NodeID
+WHERE nd.NodeID IN (Select NodeID from Orion.APM.Application)
+ORDER BY nd.Caption

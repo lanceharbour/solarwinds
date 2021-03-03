@@ -1,0 +1,3 @@
+SELECT Nodes.DisplayName, Nodes.LastBoot FROM Orion.Nodes AS Nodes
+WHERE DAYDIFF(Nodes.LastBoot, GETDATE()) >= 30 AND Nodes.Vendor = 'Windows' AND Nodes.Status = 1
+ORDER BY Nodes.LastBoot

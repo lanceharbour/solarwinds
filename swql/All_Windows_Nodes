@@ -1,0 +1,5 @@
+SELECT nd.Caption AS Node, nd.IP_Address, nip.SubnetMask, nd.Community, nd.Status, nd.StatusDescription
+FROM Orion.Nodes nd
+JOIN Orion.NodeIPAddresses nip ON nip.NodeID = nd.NodeID
+WHERE nip.SubnetMask IS NOT NULL AND nd.Vendor = 'Windows'
+ORDER BY nd.Caption

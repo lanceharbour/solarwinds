@@ -1,0 +1,6 @@
+SELECT ac.Name, ac.Description, ac.ObjectType, ac.CreatedBy, aa.CategoryType, a.ActionTypeID, a.Description
+FROM Orion.AlertConfigurations ac
+join Orion.ActionsAssignments aa on aa.parentid=ac.alertid and aa.EnvironmentType='Alerting'
+join Orion.Actions a on a.actionid=aa.ActionID
+where ac.enabled=1
+order by name, categorytype desc, sortorder

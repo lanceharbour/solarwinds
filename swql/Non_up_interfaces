@@ -1,0 +1,19 @@
+SELECT
+    Interfaces.Node.Caption AS NodeName,
+    nd.IP_Address,
+    nip.SubnetMask,
+    nd.Community,
+    Interfaces.Node.Status AS NodeStatus,
+    Interfaces.Caption AS InterfaceName,
+    Interfaces.URI,
+    Interfaces.Status,
+    nd.Description
+FROM Orion.NPM.Interfaces AS Interfaces
+JOIN Orion.Nodes nd on nd.NodeID = Interfaces.NodeID
+JOIN Orion.NodeIPAddresses nip ON nip.NodeID = Interfaces.NodeID
+WHERE Interfaces.Status != 1 
+AND Interfaces.Node.Status != 9 
+AND Interfaces.Node.Status != 2 
+AND Interfaces.Node.Vendor = 'Windows'
+AND nip.SubnetMask IS NOT NULL
+ORDER BY nd.NodeName

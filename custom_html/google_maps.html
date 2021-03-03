@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DA Davidson Map</title>
+
+    <style type="text/css">
+      /* Set the size of the div element that contains the map */
+      #map {
+        height: 500px;
+        /* The height is 500 pixels */
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        /* The width is the width of the web page */
+      }
+    </style>
+
+    <script>
+      
+      //swis query against local SW server
+      const swql="SELECT nd.NodeID, nd.Status, nd.Caption, nd.IP_Address, nd.StatusLED, nd.DetailsUrl, ncp.city, ncp.state, ncp.latitude, ncp.longitude \
+        FROM Orion.Nodes AS nd JOIN Orion.NodesCustomProperties AS ncp ON ncp.NodeID = nd.NodeID WHERE ncp.onMap = 1 AND nd.Status =2"
+      const nparams = JSON.stringify({
+        query: swql,
+        parameters: {
+        }
+      });
+
+      // Initialize and add the map    
+      function initMap() {
+      // Center map
+        const centered = {lat: 40, lng: -95.5};
+        // Center the map
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 3.75,
+          center: centered,
+          mapTypeId: 'terrain'
+        });
+
+        //ajax query to get node lat/long and place markers
+        $.ajax({
+        type: 'POST',
+        url: '/Orion/Services/Information.asmx/Query',
+        data: nparams,
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(response) {
+          //console.log('*******SWIS Results*********');
+          //console.log(response.d.Rows.length)
+          for(var i=0; i < response.d.Rows.length; i++){
+            //console.log(response.d.Rows[i])
+              var image = '/Orion/images/StatusIcons/Small-'+response.d.Rows[i][4];
+              var nodeurl = '<a href="'+response.d.Rows[i][5]+'">'+response.d.Rows[i][2]+'</a>';
+              
+              const infowindow = new google.maps.InfoWindow({
+                content: nodeurl,
+              });
+
+              const marker = new google.maps.Marker({
+              position: {lat: response.d.Rows[i][8], lng: response.d.Rows[i][9]},
+              draggable: false,
+              icon: image,
+              title: response.d.Rows[i][2],
+              map: map
+              });
+
+              marker.addListener("click", () => {
+                infowindow.open(map, marker);
+              });
+            } 
+          }
+        })
+
+        // Weather Underground overlay settings
+        var imageBounds = new google.maps.LatLngBounds(
+			  new google.maps.LatLng(22.652538062803,-128.620375523875420),
+			  new google.maps.LatLng(51.406626367301044,-67.517937876818) );
+        var radmap = new google.maps.GroundOverlay( "https://radblast-mi.wunderground.com/cgi-bin/radar/WUNIDS_composite?maxlat=50.406626367301044&maxlon=-66.517937876818&minlat=21.652538062803&minlon=-127.620375523875420&type=N0R&frame=0&num=6&delay=25&width=3400&height=1600&png=0&smooth=1&min=2&noclutter=0&rainsnow=1&nodebug=0&theext=.gif&timelabel=1&timelabel.x=1443&timelabel.y=41&brand=wundermap&reproj.automerc=1&merge=elev&rand=21854266", imageBounds);
+        radmap.setMap(map);
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=GoogleMapsAPIKey&callback=initMap&libraries=&v=weekly" defer></script>
+  </head>
+  <body>
+    <!--The div element for the map -->
+    <div id="map"></div>
+  </body>
+</html>
